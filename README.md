@@ -88,7 +88,7 @@ SELECT *
 FROM  vectors.porto_freguesias
 WHERE concelho ILIKE 'mAtOsInHoS';
 ```
-**Example 3 - like**
+**Example 3 - Like**
 Like on the other hand is case sensitive therefore the following query will give zero results.
 ```sql
 SELECT * 
@@ -104,7 +104,7 @@ SELECT freguesia, area_ha
 FROM  vectors.porto_freguesias
 WHERE concelho LIKE 'MATOSINHOS';
 ```
-**Example 5 - using alias**
+**Example 5 - Using alias**
 
 Alias are a very common way of expressing a query. An alias consists on renaming a table on the fly as in the example below:
 
