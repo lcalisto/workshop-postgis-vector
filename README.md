@@ -245,7 +245,7 @@ WHERE NOT ST_IsValid(geom);
 ### Triggers
 
 Triggers execute a given task whenever an specific event occurs in the database. This event can be anything that changes the state of your database - an insertion, a drop table, an update. They are extremely useful not only to automate tasks but also to minimize the number of interactions between the users and the database (the source of many errors...). 
-One useful and important example is a trigger that automatically fixes invalid geometries when a new row/feature is added to the table.
+One useful and important example is a trigger that automatically fixes invalid geometries when a new row/feature is added or changed in the table.
 
 **Example 12 - Create a trigger that fixes invalid multipolygon geometries in real time.**
 
