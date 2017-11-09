@@ -172,11 +172,33 @@ Time to put together what you have learned so far to solve a spatial problem.
 If you manged to solve it, try it with a small variation:
 **Find all the places that are distanced less than 300m from a railroad and are located within the municipality of Matosinhos**
 
+## Dealing with invalid geometries
+
+Although not entirely, for the most part PostGIS complies with the OGC Simple Feature Access standard (http://www.opengeospatial.org/standards/sfa), and it is according to this technical recommendation that PostGIS expects to have the geometries. That is not to say that you cannot have invalid geometries in your database, but if you do some of the spatial functions provided by PostGIS might not work as expected and yield wrong results simply because PostGIS functions assume that your geometries are valid. Therefore you should ALWAYS make sure that your geometries have no errors.
 
 
+## Working with dynamic data: views and triggers
+
+**Example ? - Create a view**
+
+Views are essentially a stored query, which means you can visualize the result of a query at anytime you want without having to type the query again. This is especially useful for complex queries that have to be run frequently over data that is very dynamic (i.e. changes frequently).
+
+To explore this concept  we will create a view from the solution to the second integration challenge:
+
+```sql
+CREATE VIEW close2railroad AS
+SELECT a.name, a.geom
+FROM vectors.lugares as a, vectors.ferrovia as b, vectors.porto_freguesias as c
+WHERE st_intersects(a.geom, ST_Buffer(b.geom, 300)) and c.concelho ilike 'MATOSINHOS' and ST_Intersects(a.geom, c.geom)
+```
+You can now load your view into QGIS just like you would any other table. The interesting part however is that if the data behind the query changes, the view will also change accordingly. 
+
+Example: lets assume the table lugares is changing frequently. If new points are created closer than 300m to railroad in the municipality of Matosinhos, the view will show those new points without you having to re-run the query!
 
 
+**Example ? - Create a trigger**
 
+Triggers execute a given task whenever an specific event occurs. This event can be anything that changes the state of your database - an insertion, a drop table, an update. They are extremely useful not only to automate tasks but also to minimize the number of interactions between the users and the database (the source of many errors...).
 
 
 
