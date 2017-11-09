@@ -115,6 +115,7 @@ WHERE a.concelho LIKE 'MATOSINHOS';
 ```
 Note that under the ``` FROM ``` clause we add the ```AS a ```, which is saying that on what this particular query concerns, the table we are calling will be known as 'a' and that is why you see an ```a. ``` prefix whenever the query is referring to rows or attributes that belong to table a. Alias are very useful if your query is calling more than one table as you will soon see. 
 
+----------
 
 ## Calling PostGIS spatial functions
 
@@ -163,7 +164,7 @@ WHERE a.concelho ilike 'MATOSINHOS' --AND ST_Intersects(a.geom,b.geom);
 Run the above query again, but this time uncomment the ``` AND ST_intersects(a.geom,b.geom); ```  by deleting the ```--``` characters and check the consumed time. 
 When we run the  **ST_Intersection** we should always add the **ST_Intersects** in the were clause, this will make sure we are only computing the intersection were in fact the geometries intersect.
 
-
+----------
 
 
 ## Integration challenge
@@ -176,7 +177,7 @@ Time to put together what you have learned so far to solve a spatial problem.
 If you manged to solve it, try it with a small variation:
 **Find all the places that are distanced less than 300m from a railroad AND are located within the municipality of Matosinhos**.
 
-
+----------
 
 ## Working with dynamic data: views and triggers
 
@@ -275,6 +276,8 @@ ON vectors.porto_freguesias FOR EACH ROW EXECUTE PROCEDURE invalid();
 ```
 Triggers are very important in a production databases, but they can be quite complex sometimes. For more information about triggers please check the official documentation:
 [https://www.postgresql.org/docs/current/static/plpgsql-trigger.html](https://www.postgresql.org/docs/current/static/plpgsql-trigger.html)
+
+----------
 
 ## Solutions for the integration challenges
 
