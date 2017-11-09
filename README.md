@@ -1,6 +1,6 @@
 # **Workshop PostGIS Vector**
 
-### This workshop aims to initialize the user in the usage of PostGIS using only vector data.
+### This workshop aims to initialize the user in PostGIS using only vector data.
 
 
 
