@@ -200,12 +200,13 @@ Example: lets assume the table lugares is changing frequently. If new points are
 
 ### Dealing with invalid geometries
 
-Although not entirely, for the most part PostGIS complies with the OGC Simple Feature Access standard (http://www.opengeospatial.org/standards/sfa), and it is according to this technical recommendation that PostGIS expects to have the geometries. That is not to say that you cannot have invalid geometries in your database, but if you do some of the spatial functions, PostGIS might not work as expected and yield wrong results simply because PostGIS functions assume that your geometries are valid. Therefore you should ALWAYS make sure that your geometries have no errors. This get even more important when multiple users are using/editing the same table.
-Since version 2.0 PostGIS have a functions to detect and repair invalid geometries.
+Although not entirely, for the most part PostGIS complies with the OGC Simple Feature Access standard (http://www.opengeospatial.org/standards/sfa), and it is according to this technical recommendation that PostGIS expects to have the geometries. That is not to say that you cannot have invalid geometries in your database, but if you do some of the spatial functions, PostGIS might not work as expected and yield wrong results simply because PostGIS functions assume that your geometries are valid. Therefore you should ALWAYS make sure that your geometries have no errors. The importance of this check is even greater when multiple users are using/editing the same table.
+
+Since PostGIS version 2.0 there are functions to detect and repair invalid geometries.
 
 **Example 9 - ST_IsValid**
 
- In order to find invalid geometries we should use ST_IsValid function.
+ In order to find invalid geometries we can use ```ST_IsValid``` function.
 
 ```sql
 SELECT a.freguesia, a.area_ha, a.geom
@@ -215,7 +216,7 @@ WHERE NOT ST_IsValid(a.geom);
 
 **Example 10 -  Simple approach to fix invalid geometries**
 
-ST_makevalid is the function that returns the fixed geometry. In this example we show how to UPDATE a table.
+```ST_makevalid``` is the function that returns a corrected geometry. In this example we show how to UPDATE a table.
 
 ```sql
 UPDATE vectors.porto_freguesias
@@ -225,11 +226,12 @@ WHERE NOT ST_IsValid(geom);
 
 **Example 11 - A better, more complete, approach to fix invalid polygons**.
 
-Although the previous example works well most of the times, in polygons or multipolygons ST_makeValid might return points or lines in some cases, a solution for this is to use a buffer of 0 meters. 
+Although the previous example works well most of the times, in some cases polygons or multipolygons ```ST_makeValid``` might return points or lines. A solution for this is to use a buffer of 0 meters: 
 
 ```sql
-UPDATE vectors.porto_freguesias
-SET geom=(ST_buffer((ST_makevalid(geom)),0))
+CREATE TABLE my_freguesias AS
+SELECT id, name, ST_buffer((ST_makevalid(geom)),0))
+FROM vectors.porto_freguesias
 WHERE NOT ST_IsValid(geom);
 ```
 
@@ -244,8 +246,8 @@ WHERE NOT ST_IsValid(geom);
 ```
 ### Triggers
 
-Triggers execute a given task whenever an specific event occurs in the database. This event can be anything that changes the state of your database - an insertion, a drop table, an update. They are extremely useful not only to automate tasks but also to minimize the number of interactions between the users and the database (the source of many errors...). 
-One useful and important example is a trigger that automatically fixes invalid geometries when a new row/feature is added or changed in the table.
+Triggers execute a given task whenever a specific event occurs in the database. This event can be anything that changes the state of your database - an insertion, a drop, an update. They are extremely useful not only to automate tasks but also to minimize the number of interactions between the users and the database (the source of many errors...). 
+One useful and important example is a trigger that automatically fixes invalid geometries when a new row/feature is added to the table.
 
 **Example 12 - Create a trigger that fixes invalid multipolygon geometries in real time.**
 
@@ -274,7 +276,7 @@ DROP TRIGGER IF EXISTS trg_c_invalid ON vectors.porto_freguesias;
 CREATE TRIGGER trg_c_invalid BEFORE INSERT OR UPDATE
 ON vectors.porto_freguesias FOR EACH ROW EXECUTE PROCEDURE invalid();
 ```
-Triggers are very important in a production databases, but they can be quite complex sometimes. For more information about triggers please check the official documentation:
+Triggers are very important in production databases, but they can be quite complex. For more information about triggers please check the official documentation:
 [https://www.postgresql.org/docs/current/static/plpgsql-trigger.html](https://www.postgresql.org/docs/current/static/plpgsql-trigger.html)
 
 ----------
