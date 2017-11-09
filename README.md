@@ -216,11 +216,12 @@ WHERE NOT ST_IsValid(a.geom);
 
 **Example 10 -  Simple approach to fix invalid geometries**
 
-```ST_makevalid``` is the function that returns a corrected geometry. In this example we show how to UPDATE a table.
+```ST_makevalid``` is the function that returns a corrected geometry. 
 
 ```sql
-UPDATE vectors.porto_freguesias
-SET geom=ST_makevalid(geom)
+CREATE TABLE my_freguesias AS
+SELECT id, name, ST_buffer((ST_makevalid(geom)),0)) as geom
+FROM vectors.porto_freguesias
 WHERE NOT ST_IsValid(geom);
 ```
 
@@ -229,15 +230,16 @@ WHERE NOT ST_IsValid(geom);
 Although the previous example works well most of the times, in some cases polygons or multipolygons ```ST_makeValid``` might return points or lines. A solution for this is to use a buffer of 0 meters: 
 
 ```sql
+DROP TABLE IF EXISTS my_freguesias;
 CREATE TABLE my_freguesias AS
-SELECT id, name, ST_buffer((ST_makevalid(geom)),0))
+SELECT id, name, ST_buffer((ST_makevalid(geom)),0)) as geom
 FROM vectors.porto_freguesias
 WHERE NOT ST_IsValid(geom);
 ```
 
 **Example 12 - And in case of multipolygons...**
 
-Because ST_buffer returns a single polygon geometry, if we have a table of multipolygons we need to apply **ST_multi** function. This function transforms any single geometry into a MULTI* geometry.
+Because ST_buffer returns a single polygon geometry, if we have a table of multipolygons we need to apply **ST_multi** function. This function transforms any single geometry into a MULTI* geometry. In this example, instead of creating a new table we will replace the invalid polygons by valid ones, using an UPDATE TABLE.
 
 ```sql
 UPDATE vectors.porto_freguesias
