@@ -113,14 +113,14 @@ SELECT a.freguesia, a.area_ha
 FROM  vectors.porto_freguesias AS a
 WHERE a.concelho LIKE 'MATOSINHOS';
 ```
-Note that under the **FROM** clause we add the **AS a**, which is saying that on what this particular query concerns, the table we are calling will be known as 'a' and that is why you see an **a.** prefix whenever the query is referring to rows or attributes that belong to table a. Alias are very useful if your query is calling more than one table as you will soon see. 
+Note that under the ``` FROM ``` clause we add the ```AS a ```, which is saying that on what this particular query concerns, the table we are calling will be known as 'a' and that is why you see an ```a. ``` prefix whenever the query is referring to rows or attributes that belong to table a. Alias are very useful if your query is calling more than one table as you will soon see. 
 
 
 ## Calling PostGIS spatial functions
 
 **Example 6 - ST_Area**
 
-Apart from the geometry columns, so far we have only been doing plain PostgreSQL. We will now start to explore some of the spatial functions offered by PostGIS. A PostGIS function usually takes the form **NameOfTheFunction(arguments/inputs)** Usually spatial function on PostGIS start with **ST_** To demonstrate this principle we will do a simple area calculation:
+Apart from the geometry columns, so far we have only been doing plain PostgreSQL. We will now start to explore some of the spatial functions offered by PostGIS. A PostGIS function usually takes the form ``` NameOfTheFunction(arguments/inputs) ``` Usually spatial function on PostGIS start with **ST_** To demonstrate this principle we will do a simple area calculation:
 
 ```sql
 SELECT a.freguesia, a.area_ha, ST_Area(a.geom)--/10000)::int
