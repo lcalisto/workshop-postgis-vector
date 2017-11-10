@@ -121,7 +121,7 @@ Note that under the ``` FROM ``` clause we add the ```AS a ```, which is saying 
 
 **Example 7 - ST_Area**
 
-Apart from the geometry columns, so far we have only been doing plain PostgreSQL. We will now start to explore some of the spatial functions offered by PostGIS. A PostGIS function usually takes the form ``` NameOfTheFunction(arguments/inputs) ``` Usually spatial function on PostGIS start with **ST_** To demonstrate this principle we will do a simple area calculation:
+Apart from the geometry columns, so far we have only been doing plain PostgreSQL. We will now start to explore some of the spatial functions offered by PostGIS. A PostGIS function usually takes the form ``` NameOfTheFunction(arguments/inputs) ``` Usually spatial function on PostGIS start with **ST_** To demonstrate this principle we will do a simple area calculation. In this example the area will be in meters because the SRID is in meters.:
 
 ```sql
 SELECT a.freguesia, a.area_ha, ST_Area(a.geom)--/10000)::int
