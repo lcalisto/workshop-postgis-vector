@@ -9,7 +9,7 @@
 
 PostGIS is a spatial database extender for the database management system (DBMS) PostgreSQL. In order to install PostGIS first we need to install PostgreSQL. You can install PostgreSQL from the official website: [https://www.postgresql.org/download/](https://www.postgresql.org/download/) .
 
-After the installation of PostgreSQL we need to install PostGIS extension. In windows you can achieve that using Stack Builder.
+After the installation of PostgreSQL we need to install PostGIS extension. On Windows you can achieve that using Stack Builder.
 Once PostGIS is installed, one can **activate the spatial extension in a new database** with:
 
 ```sql
@@ -17,7 +17,7 @@ CREATE EXTENSION POSTGIS;
 ```
 
 If you explore the database you will notice that the schema public is now populated with new tables, views and functions.
-More information about PostGIS instalation can be found at the official documentation: [https://postgis.net/docs/postgis_installation.html](https://postgis.net/docs/postgis_installation.html)
+More information about PostGIS installation can be found at the official documentation: [https://postgis.net/docs/postgis_installation.html](https://postgis.net/docs/postgis_installation.html)
 
 We also recommend a look at PostGIS FAQ:
 [https://postgis.net/docs/PostGIS_FAQ.html](https://postgis.net/docs/PostGIS_FAQ.html)
@@ -26,9 +26,9 @@ We also recommend a look at PostGIS FAQ:
 
 ## Load data into the database
 
-Assuming you are not accessing an already configured version of the database used in this workshop, you will start by creating a new empty database in your system, after which you will create the postgis extension and then import the following shapefiles: *porto_freguesias* ; *ferrovias* and *lugares*
+Assuming you are not accessing an already configured version of the database used in this workshop, you will start by creating a new empty database in your system, after which you will create the postgis extension and then import the following shapefiles from the [vectors](vectors) folder: *dist_porto_freguesias* ; *ferrovia* and *lugares*
 
-As an alternative you can restore the *postgis_vectors.backup* database from this repository, this DB already as all the vectors imported.
+As an alternative you can restore the *postgis_vector.backup* database from this repository, this DB already has all the vectors imported.
 
 ----------
 
@@ -81,7 +81,7 @@ WHERE concelho = 'MATOSINHOS';
 
 **Example 3 - Ilike**
 
-The following query will return the same result as the previous one, but by using  ```ilike``` instead of the ```=``` operator the string matching becomes case UNsensitive:
+The following query will return the same result as the previous one, but by using  ```ilike``` instead of the ```=``` operator the string matching becomes case INsensitive:
 
 ```sql 
 SELECT * 
@@ -121,7 +121,7 @@ Note that under the ``` FROM ``` clause we add the ```AS a ```, which is saying 
 
 **Example 7 - ST_Area**
 
-Apart from the geometry columns, so far we have only been doing plain PostgreSQL. We will now start to explore some of the spatial functions offered by PostGIS. A PostGIS function usually takes the form ``` NameOfTheFunction(arguments/inputs) ``` Usually spatial function on PostGIS start with **ST_** To demonstrate this principle we will do a simple area calculation. In this example the area will be in meters because the SRID is in meters.:
+Apart from the geometry columns, so far we have only been doing plain PostgreSQL. We will now start to explore some of the spatial functions offered by PostGIS. A PostGIS function usually takes the form ``` NameOfTheFunction(arguments/inputs) ``` Usually spatial functions in PostGIS start with **ST_** To demonstrate this principle we will do a simple area calculation. In this example the area will be in meters because the SRID is in meters:
 
 ```sql
 SELECT a.freguesia, a.area_ha, ST_Area(a.geom)--/10000)::int
@@ -134,7 +134,7 @@ As you can see, the function **ST_Area** takes one argument - the geometry .
 
 Here is another example. This time we call a function that outputs a geometry.
 
-```'sql
+```sql
 SELECT id, ST_Buffer(geom, 1000)
 FROM vectors.ferrovia;
 ```
@@ -149,7 +149,7 @@ SELECT b.geom, b.id
 FROM vectors.porto_freguesias as a, vectors.ferrovia as b
 WHERE a.concelho ilike 'MATOSINHOS' AND ST_Intersects(a.geom,b.geom);
 ```
-If you load the results in QGIS, the result might no be exactly what you were expecting - you will get the railroad that intersects the parish of Muro but it is not clipped to the boundaries of the parish because this query only applies a logical test, it does not construct a new geometry. In other words, it returns the features that intersect parish of Muro without changing them.
+If you load the results in QGIS, the result might not be exactly what you were expecting - you will get the railroad that intersects the parish of Muro but it is not clipped to the boundaries of the parish because this query only applies a logical test, it does not construct a new geometry. In other words, it returns the features that intersect parish of Muro without changing them.
 
 **Example 10 - ST_Intersection**
 
@@ -162,7 +162,7 @@ WHERE a.concelho ilike 'MATOSINHOS' --AND ST_Intersects(a.geom,b.geom);
 ```
 
 Run the above query again, but this time uncomment the ``` AND ST_intersects(a.geom,b.geom); ```  by deleting the ```--``` characters and check the consumed time. 
-When we run the  **ST_Intersection** we should always add the **ST_Intersects** in the were clause, this will make sure we are only computing the intersection were in fact the geometries intersect.
+When we run the  **ST_Intersection** we should always add the **ST_Intersects** in the WHERE clause, this will make sure we are only computing the intersection where in fact the geometries intersect.
 
 ----------
 
@@ -174,7 +174,7 @@ Time to put together what you have learned so far to solve a spatial problem.
 **Find all the places that are distanced less than 300m from a railroad**
 *Hint*: you will have to nest the function ST_Intersects and ST_Buffer under the WHERE clause.
 
-If you manged to solve it, try it with a small variation:
+If you managed to solve it, try it with a small variation:
 **Find all the places that are distanced less than 300m from a railroad AND are located within the municipality of Matosinhos**.
 
 ----------
@@ -183,7 +183,7 @@ If you manged to solve it, try it with a small variation:
 
 **Example 11 - Create a view**
 
-Views are essentially a stored query, which means you can visualize the result of a query at anytime you want without having to type the query again. This is especially useful for complex queries that have to be run frequently over data that is very dynamic (i.e. changes frequently).
+Views are essentially a stored query, which means you can visualize the result of a query at any time you want without having to type the query again. This is especially useful for complex queries that have to be run frequently over data that is very dynamic (i.e. changes frequently).
 
 To explore this concept  we will create a view from the solution to the second integration challenge:
 
@@ -220,19 +220,19 @@ WHERE NOT ST_IsValid(a.geom);
 
 ```sql
 CREATE TABLE my_freguesias AS
-SELECT id, name, ST_buffer((ST_makevalid(geom)),0)) as geom
+SELECT id, freguesia, ST_makevalid(geom) as geom
 FROM vectors.porto_freguesias
 WHERE NOT ST_IsValid(geom);
 ```
 
 **Example 14 - A better, more complete, approach to fix invalid polygons**.
 
-Although the previous example works well most of the times, in some cases polygons or multipolygons ```ST_makeValid``` might return points or lines. A solution for this is to use a buffer of 0 meters: 
+Although the previous example works well most of the time, in some cases, when fixing polygons or multipolygons, ```ST_makeValid``` might return points or lines. A solution for this is to use a buffer of 0 meters: 
 
 ```sql
 DROP TABLE IF EXISTS my_freguesias;
 CREATE TABLE my_freguesias AS
-SELECT id, name, ST_buffer((ST_makevalid(geom)),0)) as geom
+SELECT id, freguesia, ST_buffer(ST_makevalid(geom),0) as geom
 FROM vectors.porto_freguesias
 WHERE NOT ST_IsValid(geom);
 ```
@@ -243,7 +243,7 @@ Because ST_buffer returns a single polygon geometry, if we have a table of multi
 
 ```sql
 UPDATE vectors.porto_freguesias
-SET geom=(ST_multi(ST_buffer((ST_makevalid(geom)),0)))
+SET geom=ST_multi(ST_buffer(ST_makevalid(geom),0))
 WHERE NOT ST_IsValid(geom);
 ```
 ### Triggers
@@ -261,7 +261,7 @@ CREATE OR REPLACE FUNCTION invalid()
 $BODY$
 BEGIN
 	if not st_isValid(NEW.geom) THEN
-	NEW.geom = (ST_multi(ST_buffer((ST_makevalid(NEW.geom)),0))); 
+	NEW.geom = ST_multi(ST_buffer(ST_makevalid(NEW.geom),0)); 
 	RETURN NEW;
  else    
       RETURN NEW;
